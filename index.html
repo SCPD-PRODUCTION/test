@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST Forgot Password - Masjid</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e5a2e, #2d7a3e);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #2d7a3e;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #2d7a3e;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #2d7a3e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #1e5a2e;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .otp-display {
+            background: #2d7a3e;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            display: none;
+        }
+        
+        .step {
+            display: none;
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .status.online {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕌 TEST Forgot Password</h1>
+        <p class="subtitle">Masjid Jami Baiturrahman</p>
+        
+        <div id="serverStatus" class="status">Checking server...</div>
+        
+        <div id="messageBox" class="message"></div>
+        
+        <!-- STEP 1: Request OTP -->
+        <div id="step1" class="step active">
+            <div class="info">
+                <strong>📝 Langkah 1: Request OTP</strong><br>
+                Masukkan email yang terdaftar untuk mendapatkan kode OTP.
+            </div>
+            
+            <div class="form-group">
+                <label>Email Terdaftar</label>
+                <input type="email" id="emailInput" placeholder="tsaqibys@gmail.com" value="tsaqibys@gmail.com">
+            </div>
+            
+            <button onclick="requestOTP()">Kirim OTP</button>
+        </div>
+        
+        <!-- STEP 2: Verify OTP -->
+        <div id="step2" class="step">
+            <div class="info">
+                <strong>📝 Langkah 2: Masukkan OTP</strong><br>
+                Kode OTP telah dibuat. Masukkan kode di bawah ini.
+            </div>
+            
+            <div id="otpDisplay" class="otp-display"></div>
+            
+            <div class="form-group">
+                <label>Kode OTP (6 digit)</label>
+                <input type="text" id="otpInput" placeholder="123456" maxlength="6">
+            </div>
+            
+            <button onclick="verifyOTP()">Verify OTP</button>
+            <button onclick="backToStep1()" style="background: #666; margin-top: 10px;">Kembali</button>
+        </div>
+        
+        <!-- STEP 3: Reset Password -->
+        <div id="step3" class="step">
+            <div class="info">
+                <strong>📝 Langkah 3: Reset Password</strong><br>
+                Buat password baru untuk akun Anda.
+            </div>
+            
+            <div class="form-group">
+                <label>Password Baru</label>
+                <input type="password" id="newPassword" placeholder="Minimal 6 karakter">
+            </div>
+            
+            <div class="form-group">
+                <label>Konfirmasi Password</label>
+                <input type="password" id="confirmPassword" placeholder="Ketik ulang password">
+            </div>
+            
+            <button onclick="resetPassword()">Reset Password</button>
+            <button onclick="backToStep1()" style="background: #666; margin-top: 10px;">Kembali</button>
+        </div>
+        
+        <!-- SUCCESS -->
+        <div id="step4" class="step">
+            <div class="info" style="background: #d4edda; color: #155724;">
+                <strong>✅ Password Berhasil Direset!</strong><br><br>
+                Anda sekarang bisa login dengan password baru.<br><br>
+                Email: <strong id="successEmail"></strong><br>
+                Password: <strong>[password baru Anda]</strong>
+            </div>
+            
+            <button onclick="backToStep1()">Reset Ulang</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:2011/api';
+        let currentEmail = '';
+        
+        // Check server status
+        async function checkServer() {
+            try {
+                const response = await fetch(`${API_URL}/data`);
+                if (response.ok) {
+                    showStatus('✅ Server Online - Ready!', 'online');
+                } else {
+                    showStatus('❌ Server Error', 'offline');
+                }
+            } catch (error) {
+                showStatus('❌ Server Offline - Jalankan: node server.js', 'offline');
+            }
+        }
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('serverStatus');
+            status.textContent = message;
+            status.className = 'status ' + type;
+        }
+        
+        function showMessage(message, type) {
+            const box = document.getElementById('messageBox');
+            box.textContent = message;
+            box.className = 'message ' + type;
+            box.style.display = 'block';
+            
+            setTimeout(() => {
+                box.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById('step' + stepNumber).classList.add('active');
+        }
+        
+        async function requestOTP() {
+            const email = document.getElementById('emailInput').value;
+            
+            if (!email) {
+                showMessage('Email harus diisi!', 'error');
+                return;
+            }
+            
+            if (!email.includes('@')) {
+                showMessage('Format email tidak valid!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentEmail = email;
+                    
+                    // Tampilkan OTP
+                    if (data.data && data.data.otp_for_testing) {
+                        const otpDisplay = document.getElementById('otpDisplay');
+                        otpDisplay.textContent = data.data.otp_for_testing;
+                        otpDisplay.style.display = 'block';
+                        
+                        console.log('🔑 OTP:', data.data.otp_for_testing);
+                        
+                        showMessage('✅ OTP berhasil dibuat! Lihat kode di bawah.', 'success');
+                        showStep(2);
+                    }
+                } else {
+                    showMessage('❌ ' + (data.message || 'Gagal membuat OTP'), 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Koneksi gagal! Pastikan server berjalan di port 2011', 'error');
+            }
+        }
+        
+        async function verifyOTP() {
+            const otp = document.getElementById('otpInput').value;
+            
+            if (!otp) {
+                showMessage('Kode OTP harus diisi!', 'error');
+                return;
+            }
+            
+            if (otp.length !== 6) {
+                showMessage('Kode OTP harus 6 digit!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/verify-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: currentEmail,
+                        otp: otp 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('✅ OTP valid!', 'success');
+                    showStep(3);
+                } else {
+                    showMessage('❌ ' + (data.message || 'OTP tidak valid'), 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Koneksi gagal!', 'error');
+            }
+        }
+        
+        async function resetPassword() {
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            
+            if (!newPass || !confirmPass) {
+                showMessage('Semua field harus diisi!', 'error');
+                return;
+            }
+            
+            if (newPass !== confirmPass) {
+                showMessage('Password tidak cocok!', 'error');
+                return;
+            }
+            
+            if (newPass.length < 6) {
+                showMessage('Password minimal 6 karakter!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/reset-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: currentEmail,
+                        new_password: newPass 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('successEmail').textContent = currentEmail;
+                    showMessage('✅ Password berhasil direset!', 'success');
+                    showStep(4);
+                } else {
+                    showMessage('❌ ' + (data.message || 'Gagal reset password'), 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Koneksi gagal!', 'error');
+            }
+        }
+        
+        function backToStep1() {
+            currentEmail = '';
+            document.getElementById('emailInput').value = '';
+            document.getElementById('otpInput').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('otpDisplay').style.display = 'none';
+            showStep(1);
+        }
+        
+        // Check server on load
+        checkServer();
+        setInterval(checkServer, 5000); // Check every 5 seconds
+    </script>
+</body>
+</html>
